@@ -79,14 +79,14 @@ def get_favorites(user_id):
 
 @api.route("/favorite/planet/<int:planet_id>", methods=["POST"])
 def add_favorite_planet(planet_id):
-    favorite_planet = Planet(id = planet_id)
-    db.session.add(favorite_planet)
-    db.session.commit()
-
-    # favorite_planet = db.session.post(Planet, planet_id)
-    # if favorite_planet is None:
-    #     return jsonify({"message:" "favorite planet not found"}), 404
-    # return jsonify(favorite_planet.serialize()), 200
+    response_body = {
+        "user": User,
+        "message": "Hello! I'm a message that came from the backend, check the network tab on the google inspector and you will see the GET request"
+    }
+    return jsonify(response_body), 200
+    # favorite_planet = Planet(id = planet_id)
+    # db.session.add(favorite_planet)
+    # db.session.commit()
 
 
 @api.route("/favorite/people/<int:people_id>", methods=["POST"])
