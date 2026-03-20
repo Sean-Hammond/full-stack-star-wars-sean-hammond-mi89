@@ -76,12 +76,13 @@ def get_favorites(user_id):
 
 # We will send the user in the body
 
-
 @api.route("/favorite/planet/<int:planet_id>", methods=["POST"])
 def add_favorite_planet(planet_id):
+    favorite_planet = db.session.get(User, planet_id)
     response_body = {
-        "user": User,
-        "message": "Hello! I'm a message that came from the backend, check the network tab on the google inspector and you will see the GET request"
+        "user": favorite_planet,
+        "favorite_planet": planet_id,
+        "message": "POST operation for a new favorite Star Wars planet"
     }
     return jsonify(response_body), 200
     # favorite_planet = Planet(id = planet_id)
@@ -91,10 +92,16 @@ def add_favorite_planet(planet_id):
 
 @api.route("/favorite/people/<int:people_id>", methods=["POST"])
 def add_favorite_person(people_id):
-    favorite_character = db.session.post(Character, people_id)
-    if favorite_character is None:
-        return jsonify({"message:" "favorite character not found"}), 404
-    return jsonify(favorite_character.serialize()), 200
+    response_body = {
+        "user": User,
+        "favorite_character": people_id,
+        "message": "Hello! I'm a message that came from the backend, check the network tab on the google inspector and you will see the GET request"
+    }
+    return jsonify(response_body), 200
+    # favorite_character = db.session.post(Character, people_id)
+    # if favorite_character is None:
+    #     return jsonify({"message:" "favorite character not found"}), 404
+    # return jsonify(favorite_character.serialize()), 200
 
 
 @api.route("/favorite/planet/<int:planet_id>", methods=["DELETE"])
