@@ -40,6 +40,7 @@ class Character(db.Model):
         back_populates="character")
     planet: Mapped["Planet"] = relationship(back_populates="characters")
 
+    # Serializing makes it so we can access this Python object as a dictionary in routes.py
     def serialize(self):
         return {
             "id": self.id,

@@ -32,18 +32,25 @@ def get_all_people():
 
 @api.route("/people/<int:people_id>", methods=["GET"])
 def get_single_person(people_id):
-    single_person = db.session.get(Character, people_id)  # Recommended direct method
+    single_person = db.session.get(Character, people_id)  # (see https://4geeks.com/syllabus/miami-89/read/everything-you-need-to-start-using-sqlalchemy)
     if single_person is None:
         return jsonify({"message": "character not found"}), 404
     return jsonify(single_person.serialize()), 200
 
 @api.route("/planets", methods=["GET"])
 def get_planets():
-    pass
+    all_planets = db.session.execute(select(Planet)).scalars().all()
+    planets_dictionaries = []
+    for planet in all_planets:
+        planets_dictionaries.append(planet.serialize())
+    return jsonify(planets_dictionaries), 200
 
 @api.route("/planets/<int:planet_id>", methods=["GET"])
 def get_single_planet(planet_id):
-    pass
+    single_planet = db.session.get(Planet, planet_id)
+    if single_planet is None:
+        return jsonify({"message": "planet not found"}), 404
+    return jsonify(single_planet.serialize()), 200
 
 @api.route("/user", methods=["GET"])
 def get_users():
