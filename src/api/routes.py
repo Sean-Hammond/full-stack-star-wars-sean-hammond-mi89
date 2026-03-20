@@ -78,7 +78,7 @@ def get_favorites(user_id):
 
 
 @api.route("/favorite/planet/<int:planet_id>", methods=["POST"])
-def add_favorite_planet(planet_id):
+def add_favorite_planet(planet_id, user_id):
     user_id = db.session.get(User, user_id)
     planet = Planet(id=planet_id)
     if planet is None:
@@ -92,7 +92,7 @@ def add_favorite_planet(planet_id):
 
 
 @api.route("/favorite/people/<int:people_id>", methods=["POST"])
-def add_favorite_person(people_id):
+def add_favorite_person(people_id, user_id):
     user_id = db.session.get(User, user_id)
     character = Character(id=people_id)
     if character is None:
@@ -106,7 +106,7 @@ def add_favorite_person(people_id):
 
 
 @api.route("/favorite/planet/<int:planet_id>", methods=["DELETE"])
-def delete_favorite_planet(planet_id):
+def delete_favorite_planet(planet_id, user_id):
     user_id = db.session.get(User, user_id)
     planet = Planet(id=planet_id)
     if planet is None:
@@ -120,7 +120,7 @@ def delete_favorite_planet(planet_id):
 
 
 @api.route("/favorite/people/<int:people_id>", methods=["DELETE"])
-def delete_favorite_person(people_id):
+def delete_favorite_person(people_id, user_id):
     user_id = db.session.get(User, user_id)
     character = Planet(id=people_id)
     if character is None:
@@ -131,3 +131,8 @@ def delete_favorite_person(people_id):
     db.session.delete(favorite_character)
     db.session.commit()
     return jsonify({"message": "favorite character deleted"}), 200
+
+# Update the database by running the terminal commands:
+    # $ pipenv run migrate
+    # $ pipenv run upgrade
+    # $ pipenv run start
