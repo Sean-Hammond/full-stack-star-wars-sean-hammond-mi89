@@ -76,12 +76,17 @@ def get_favorites(user_id):
 
 # We will send the user in the body
 
+
 @api.route("/favorite/planet/<int:planet_id>", methods=["POST"])
 def add_favorite_planet(planet_id):
-    favorite_planet = db.session.post(Planet, planet_id)
-    if favorite_planet is None:
-        return jsonify({"message:" "favorite planet not found"}), 404
-    return jsonify(favorite_planet.serialize()), 200
+    favorite_planet = Planet(id = planet_id)
+    db.session.add(favorite_planet)
+    db.session.commit()
+
+    # favorite_planet = db.session.post(Planet, planet_id)
+    # if favorite_planet is None:
+    #     return jsonify({"message:" "favorite planet not found"}), 404
+    # return jsonify(favorite_planet.serialize()), 200
 
 
 @api.route("/favorite/people/<int:people_id>", methods=["POST"])
