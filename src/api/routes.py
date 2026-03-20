@@ -122,16 +122,18 @@ def delete_favorite_planet(planet_id, user_id):
 
 @api.route("/favorite/people/<int:people_id>", methods=["DELETE"])
 def delete_favorite_person(people_id):
-    # user_id = db.session.get(User, user_id)
     data = request.get_json()
     user_id = data.get("user_id")  # user_id comes from request body
-    character = Planet(id=people_id)
+    character = db.session.get(Planet, people_id)
     if character is None:
         return jsonify({"message": "character not found"}), 404
-    if user_id is None:
+    user = db.session.get(User, user_id)
+    if user is None:
         return jsonify({"message": "user not found"}), 404
-    favorite_character = Favorite_Character(
+    favorite_character = Favorite_Character.query.filter_by(
         user_id=user_id, people_id=people_id)
+    if favorite_character is None:
+        return jsonify({"message": "favorite character not found"}), 404
     db.session.delete(favorite_character)
     db.session.commit()
     return jsonify({"message": "favorite character deleted"}), 200
