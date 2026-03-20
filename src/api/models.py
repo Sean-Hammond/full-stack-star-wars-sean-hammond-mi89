@@ -114,6 +114,7 @@ class Favorite_Planet(db.Model):
 #     species: Mapped["Species"] = relationship(
 #         back_populates="users_who_favorite")
     
+# Note about the previous project (https://github.com/Sean-Hammond/datamodel-starwars-sean-hammond-mi89), in case same applies here:
 # Terminal code to run if the pipenv run migrate gives a Flask error:
     # rm -R -f ./migrations &&
     # pipenv run init &&
