@@ -22,6 +22,7 @@ def handle_hello():
 
     return jsonify(response_body), 200
 
+
 @api.route("/people", methods=["GET"])
 def get_all_people():
     all_people = db.session.execute(select(Character)).scalars().all()
@@ -30,12 +31,15 @@ def get_all_people():
         people_dictionaries.append(person.serialize())
     return jsonify(people_dictionaries), 200
 
+
 @api.route("/people/<int:people_id>", methods=["GET"])
 def get_single_person(people_id):
-    single_person = db.session.get(Character, people_id)  # (see https://4geeks.com/syllabus/miami-89/read/everything-you-need-to-start-using-sqlalchemy)
+    # (see https://4geeks.com/syllabus/miami-89/read/everything-you-need-to-start-using-sqlalchemy)
+    single_person = db.session.get(Character, people_id)
     if single_person is None:
         return jsonify({"message": "character not found"}), 404
     return jsonify(single_person.serialize()), 200
+
 
 @api.route("/planets", methods=["GET"])
 def get_planets():
@@ -45,6 +49,7 @@ def get_planets():
         planets_dictionaries.append(planet.serialize())
     return jsonify(planets_dictionaries), 200
 
+
 @api.route("/planets/<int:planet_id>", methods=["GET"])
 def get_single_planet(planet_id):
     single_planet = db.session.get(Planet, planet_id)
@@ -52,7 +57,8 @@ def get_single_planet(planet_id):
         return jsonify({"message": "planet not found"}), 404
     return jsonify(single_planet.serialize()), 200
 
-@api.route("/user", methods=["GET"])
+
+@api.route("/users", methods=["GET"])
 def get_users():
     all_users = db.session.execute(select(User)).scalars().all()
     user_dictionaries = []
@@ -60,22 +66,30 @@ def get_users():
         user_dictionaries.append(user.serialize())
     return jsonify(user_dictionaries), 200
 
+
 @api.route("/users/<int:user_id>/favorites", methods=["GET"])
 def get_favorites(user_id):
-    pass
+    user_favorites = db.session.get(User, user_id)
+    if user_favorites is None:
+        return jsonify({"message": "favorite not found"}), 404
+    return jsonify(user_favorites.serialize()), 200
 
-# We will send the user in the body 
+# We will send the user in the body
+
 @api.route("/favorite/planet/<int:planet_id>", methods=["POST"])
 def add_favorite_planet(planet_id):
     pass
+
 
 @api.route("/favorite/people/<int:people_id>", methods=["POST"])
 def add_favorite_person(people_id):
     pass
 
+
 @api.route("/favorite/planet/<int:planet_id>", methods=["DELETE"])
 def delete_favorite_planet(planet_id):
     pass
+
 
 @api.route("/favorite/people/<int:people_id>", methods=["DELETE"])
 def delete_favorite_person(people_id):
