@@ -54,7 +54,11 @@ def get_single_planet(planet_id):
 
 @api.route("/user", methods=["GET"])
 def get_users():
-    pass
+    all_users = db.session.execute(select(User)).scalars().all()
+    user_dictionaries = []
+    for user in all_users:
+        user_dictionaries.append(user.serialize())
+    return jsonify(user_dictionaries), 200
 
 @api.route("/users/<int:user_id>/favorites", methods=["GET"])
 def get_favorites(user_id):
