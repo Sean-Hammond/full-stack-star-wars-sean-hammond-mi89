@@ -83,12 +83,12 @@ def add_favorite_planet(planet_id):
     user = db.session.get(User, body["user_id"])
     planet = db.session.get(Character, planet_id)
     if user is None or planet is None:
-        return jsonify({"message": "invalid user id or favorite id"}), 404
+        return jsonify({"message": "invalid user id or favorite planet id"}), 404
     user.favorite_planets.append(planet)
     db.session.commit()
     seralized_user = user.serialize()
     print("serialized user: " + seralized_user)
-    return jsonify(seralized_user["favorite planets"]), 201
+    return jsonify(seralized_user["favorite_planets"]), 201
 
 
 @api.route("/favorite/people/<int:people_id>", methods=["POST"])
@@ -97,60 +97,41 @@ def add_favorite_person(people_id):
     user = db.session.get(User, body["user_id"])
     character = db.session.get(Character, people_id)
     if user is None or character is None:
-        return jsonify({"message": "invalid user id or favorite id"}), 404
+        return jsonify({"message": "invalid user id or favorite people id"}), 404
     user.favorite_characters.append(character)
     db.session.commit()
     seralized_user = user.serialize()
     print("serialized user: " + seralized_user)
-    return jsonify(seralized_user["favorite characters"]), 201
-
-
-# @api.route("/favorite/people/<int:people_id>", methods=["POST"])
-# def add_favorite_person(people_id, user_id):
-#     user_id = db.session.get(User, user_id)
-#     character = Character(id=people_id)
-#     if character is None:
-#         return jsonify({"message": "character not found"}), 404
-#     if user_id is None:
-#         return jsonify({"message": "user not found"}), 404
-#     new_favorite_character = Favorite_Character(
-#         user_id=user_id, people_id=people_id)
-#     db.session.add(new_favorite_character)
-#     db.session.commit()
-#     return jsonify({"message": "new favorite character added"}), 201
+    return jsonify(seralized_user["favorite_characters"]), 201
 
 
 @api.route("/favorite/planet/<int:planet_id>", methods=["DELETE"])
-def delete_favorite_planet(planet_id, user_id):
-    user_id = db.session.get(User, user_id)
-    planet = Planet(id=planet_id)
-    if planet is None:
-        return jsonify({"message": "planet not found"}), 404
-    if user_id is None:
-        return jsonify({"message": "user not found"}), 404
-    favorite_planet = Favorite_Planet(user_id=user_id, planet_id=planet_id)
-    db.session.delete(favorite_planet)
+def delete_favorite_planet(planet_id):
+    body = request.json
+    user = db.session.get(User, body["user_id"])
+    planet = db.session.get(Planet, planet_id)
+    if user is None or planet is None:
+        return jsonify({"message": "invalid user id or favorite id"}), 404
+    user.favorite_planets.remove(planet)
     db.session.commit()
-    return jsonify({"message": "favorite planet deleted"}), 200
+    seralized_user = user.serialize()
+    print("serialized user: " + seralized_user)
+    return jsonify(seralized_user["favorite_planets"]), 201
 
 
 @api.route("/favorite/people/<int:people_id>", methods=["DELETE"])
 def delete_favorite_person(people_id):
-    data = request.get_json()
-    user_id = data.get("user_id")  # user_id comes from request body
-    character = db.session.get(Planet, people_id)
-    if character is None:
-        return jsonify({"message": "character not found"}), 404
-    user = db.session.get(User, user_id)
-    if user is None:
-        return jsonify({"message": "user not found"}), 404
-    favorite_character = Favorite_Character.query.filter_by(
-        user_id=user_id, people_id=people_id)
-    if favorite_character is None:
-        return jsonify({"message": "favorite character not found"}), 404
-    db.session.delete(favorite_character)
+    body = request.json
+    user = db.session.get(User, body["user_id"])
+    character = db.session.get(Character, people_id)
+    if user is None or character is None:
+        return jsonify({"message": "invalid user id or favorite id"}), 404
+    user.favorite_characters.remove(character)
     db.session.commit()
-    return jsonify({"message": "favorite character deleted"}), 200
+    seralized_user = user.serialize()
+    print("serialized user: " + seralized_user)
+    return jsonify(seralized_user["favorite_characters"]), 201
+
 
 # Update the database by running the terminal commands:
     # $ pipenv run migrate
