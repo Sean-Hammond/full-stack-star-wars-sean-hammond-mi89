@@ -69,10 +69,10 @@ def get_users():
 
 @api.route("/users/<int:user_id>/favorites", methods=["GET"])
 def get_favorites(user_id):
-    user_favorites = db.session.get(User, user_id)
-    if user_favorites is None:
+    user = db.session.get(User, user_id)
+    if user is None:
         return jsonify({"message": "favorites not found"}), 404
-    return jsonify(user_favorites.serialize()), 200
+    return jsonify(user.serialize()), 200
 
 # We will send the user in the body
 
@@ -92,18 +92,32 @@ def add_favorite_planet(planet_id, user_id):
 
 
 @api.route("/favorite/people/<int:people_id>", methods=["POST"])
-def add_favorite_person(people_id, user_id):
-    user_id = db.session.get(User, user_id)
-    character = Character(id=people_id)
-    if character is None:
-        return jsonify({"message": "character not found"}), 404
-    if user_id is None:
-        return jsonify({"message": "user not found"}), 404
-    new_favorite_character = Favorite_Character(
-        user_id=user_id, people_id=people_id)
-    db.session.add(new_favorite_character)
+def add_favorite_person(people_id):
+    body = request.json
+    user = db.session.get(User, body["user_id"])
+    character = db.session.get(Character, people_id)
+    if user is None or character is None:
+        return jsonify({"message": "invalid user id or favorite id"}), 404
+    user.favorite_characters.append(character)
     db.session.commit()
-    return jsonify({"message": "new favorite character added"}), 201
+    seralized_user = user.serialize()
+    print("serialized user: " + seralized_user)
+    return jsonify(seralized_user["favorite characters"]), 201
+
+
+# @api.route("/favorite/people/<int:people_id>", methods=["POST"])
+# def add_favorite_person(people_id, user_id):
+#     user_id = db.session.get(User, user_id)
+#     character = Character(id=people_id)
+#     if character is None:
+#         return jsonify({"message": "character not found"}), 404
+#     if user_id is None:
+#         return jsonify({"message": "user not found"}), 404
+#     new_favorite_character = Favorite_Character(
+#         user_id=user_id, people_id=people_id)
+#     db.session.add(new_favorite_character)
+#     db.session.commit()
+#     return jsonify({"message": "new favorite character added"}), 201
 
 
 @api.route("/favorite/planet/<int:planet_id>", methods=["DELETE"])
