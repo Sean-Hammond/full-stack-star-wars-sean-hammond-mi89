@@ -96,7 +96,8 @@ def add_favorite_person(people_id):
 
     db.session.commit()
     seralized_user = user.serialize()
-    return jsonify(seralized_user["favorite_characters"]), 201
+    # return jsonify(seralized_user["favorite_characters"]), 201
+    return jsonify(seralized_user), 201
 
 
 @api.route("/favorite/planet/<int:planet_id>", methods=["POST"])
@@ -116,7 +117,8 @@ def add_favorite_planet(planet_id):
 
     db.session.commit()
     seralized_user = user.serialize()
-    return jsonify(seralized_user["favorite_planets"]), 201
+    # return jsonify(seralized_user["favorite_planets"]), 201
+    return jsonify(seralized_user), 201
 
 
 @api.route("/favorite/people/<int:people_id>", methods=["DELETE"])
