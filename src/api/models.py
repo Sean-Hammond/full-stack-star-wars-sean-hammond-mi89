@@ -33,10 +33,10 @@ class User(db.Model):
 
 class Character(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    mass: Mapped[int] = mapped_column(nullable=False)
-    height: Mapped[int] = mapped_column(nullable=False)
-    age: Mapped[int] = mapped_column(nullable=False)
+    name: Mapped[str] = mapped_column(String(25), unique=True, nullable=False)
+    mass: Mapped[str] = mapped_column(String(25), nullable=False)
+    height: Mapped[str] = mapped_column(String(25), nullable=False)
+    born: Mapped[str] = mapped_column(String(25), nullable=False)
     description: Mapped[str] = mapped_column(
         String(500), unique=True, nullable=False)
     planet_id: Mapped[int] = mapped_column(ForeignKey("planet.id"))
@@ -51,7 +51,7 @@ class Character(db.Model):
             "name": self.name,
             "mass": self.mass,
             "height": self.height,
-            "age": self.age,
+            "born": self.born,
             "description": self.description,
             "planet": self.planet.serialize()
             # do not serialize the password, its a security breach
@@ -60,22 +60,24 @@ class Character(db.Model):
 
 class Planet(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    mass: Mapped[int] = mapped_column(nullable=False)
-    circumference: Mapped[int] = mapped_column(nullable=False)
+    name: Mapped[str] = mapped_column(String(25), unique=True, nullable=False)
+    population: Mapped[str] = mapped_column(String(25), nullable=False)
+    climate: Mapped[str] = mapped_column(String(50), nullable=False)
+    terrain: Mapped[str] = mapped_column(String(50), nullable=False)
     characters: Mapped[List["Character"]] = relationship(
         back_populates="planet")
     description: Mapped[str] = mapped_column(
         String(500), unique=True, nullable=False)
     users_who_favorite: Mapped[List["Favorite_Planet"]
                                ] = relationship(back_populates="planet")
-    
+
     def serialize(self):
         return {
             "id": self.id,
             "name": self.name,
-            "mass": self.mass,
-            "circumference": self.circumference,
+            "population": self.population,
+            "climate": self.climate,
+            "terrain": self.terrain,
             "description": self.description,
             # do not serialize the password, its a security breach
         }
@@ -118,9 +120,8 @@ class Favorite_Planet(db.Model):
 #     user: Mapped["User"] = relationship(back_populates="favorite_species")
 #     species: Mapped["Species"] = relationship(
 #         back_populates="users_who_favorite")
-    
-# Note about the previous project (https://github.com/Sean-Hammond/datamodel-starwars-sean-hammond-mi89), in case same applies here:
-# Terminal code to run if the pipenv run migrate gives a Flask error:
+
+# Terminal code to run if the pipenv run migrate gives a Flask error (this code below is also found in docs/assets/reset_migrations.bash)
     # rm -R -f ./migrations &&
     # pipenv run init &&
     # dropdb -h localhost -U gitpod example || true &&
