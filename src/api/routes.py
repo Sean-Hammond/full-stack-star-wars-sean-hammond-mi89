@@ -105,32 +105,32 @@ def add_favorite_person(people_id):
     return jsonify(seralized_user["favorite_characters"]), 201
 
 
-@api.route("/favorite/planet/<int:planet_id>", methods=["DELETE"])
-def delete_favorite_planet(planet_id):
-    body = request.json
-    user = db.session.get(User, body["user_id"])
-    planet = db.session.get(Planet, planet_id)
-    if user is None or planet is None:
-        return jsonify({"message": "invalid user id or favorite id"}), 404
-    user.favorite_planets.remove(planet)
-    db.session.commit()
-    seralized_user = user.serialize()
-    print("serialized user: " + seralized_user)
-    return jsonify(seralized_user["favorite_planets"]), 201
-
-
 @api.route("/favorite/people/<int:people_id>", methods=["DELETE"])
 def delete_favorite_person(people_id):
     body = request.json
     user = db.session.get(User, body["user_id"])
     character = db.session.get(Character, people_id)
     if user is None or character is None:
-        return jsonify({"message": "invalid user id or favorite id"}), 404
+        return jsonify({"message": "invalid user id or favorite people id"}), 404
     user.favorite_characters.remove(character)
     db.session.commit()
     seralized_user = user.serialize()
     print("serialized user: " + seralized_user)
     return jsonify(seralized_user["favorite_characters"]), 201
+
+
+@api.route("/favorite/planet/<int:planet_id>", methods=["DELETE"])
+def delete_favorite_planet(planet_id):
+    body = request.json
+    user = db.session.get(User, body["user_id"])
+    planet = db.session.get(Planet, planet_id)
+    if user is None or planet is None:
+        return jsonify({"message": "invalid user id or favorite planet id"}), 404
+    user.favorite_planets.remove(planet)
+    db.session.commit()
+    seralized_user = user.serialize()
+    print("serialized user: " + seralized_user)
+    return jsonify(seralized_user["favorite_planets"]), 201
 
 
 # Update the database by running the terminal commands:
