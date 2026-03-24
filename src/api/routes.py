@@ -86,7 +86,14 @@ def add_favorite_person(people_id):
     character = db.session.get(Character, people_id)
     if user is None or character is None:
         return jsonify({"message": "invalid user id or favorite people id"}), 404
-    user.favorite_characters.append(character)
+    
+    # OLD CODE to add favorite to database, DIDN'T WORK:
+        # user.favorite_characters.append(character)
+    
+    # NEW CODE to add favorite to database, NOW TESTING:
+    favorite_character = Favorite_Character(user_id=user.id, character_id=character.id)
+    db.session.add(favorite_character)
+
     db.session.commit()
     seralized_user = user.serialize()
     return jsonify(seralized_user["favorite_characters"]), 201
@@ -101,7 +108,12 @@ def add_favorite_planet(planet_id):
     planet = db.session.get(Planet, planet_id)
     if user is None or planet is None:
         return jsonify({"message": "invalid user id or favorite planet id"}), 404
-    user.favorite_planets.append(planet)
+    
+    # user.favorite_planets.append(planet)
+
+    favorite_planet = Favorite_Planet(user_id=user.id, planet_id=planet.id)
+    db.session.add(favorite_planet)
+
     db.session.commit()
     seralized_user = user.serialize()
     return jsonify(seralized_user["favorite_planets"]), 201
