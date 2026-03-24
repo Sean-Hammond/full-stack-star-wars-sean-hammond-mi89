@@ -77,19 +77,6 @@ def get_favorites(user_id):
 # We will send the user in the body
 
 
-@api.route("/favorite/planet/<int:planet_id>", methods=["POST"])
-def add_favorite_planet(planet_id):
-    body = request.json
-    user = db.session.get(User, body["user_id"])
-    planet = db.session.get(Planet, planet_id)
-    if user is None or planet is None:
-        return jsonify({"message": "invalid user id or favorite planet id"}), 404
-    user.favorite_planets.append(planet)
-    db.session.commit()
-    seralized_user = user.serialize()
-    return jsonify(seralized_user["favorite_planets"]), 201
-
-
 @api.route("/favorite/people/<int:people_id>", methods=["POST"])
 def add_favorite_person(people_id):
     body = request.json
@@ -101,6 +88,19 @@ def add_favorite_person(people_id):
     db.session.commit()
     seralized_user = user.serialize()
     return jsonify(seralized_user["favorite_characters"]), 201
+
+
+@api.route("/favorite/planet/<int:planet_id>", methods=["POST"])
+def add_favorite_planet(planet_id):
+    body = request.json
+    user = db.session.get(User, body["user_id"])
+    planet = db.session.get(Planet, planet_id)
+    if user is None or planet is None:
+        return jsonify({"message": "invalid user id or favorite planet id"}), 404
+    user.favorite_planets.append(planet)
+    db.session.commit()
+    seralized_user = user.serialize()
+    return jsonify(seralized_user["favorite_planets"]), 201
 
 
 @api.route("/favorite/people/<int:people_id>", methods=["DELETE"])
