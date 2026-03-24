@@ -86,12 +86,13 @@ def add_favorite_person(people_id):
     character = db.session.get(Character, people_id)
     if user is None or character is None:
         return jsonify({"message": "invalid user id or favorite people id"}), 404
-    
+
     # OLD CODE to add favorite to database, DIDN'T WORK:
         # user.favorite_characters.append(character)
-    
+
     # NEW CODE to add favorite to database, NOW TESTING:
-    favorite_character = Favorite_Character(user_id=user.id, character_id=character.id)
+    favorite_character = Favorite_Character(
+        user_id=user.id, character_id=character.id)
     db.session.add(favorite_character)
 
     db.session.commit()
@@ -109,7 +110,7 @@ def add_favorite_planet(planet_id):
     planet = db.session.get(Planet, planet_id)
     if user is None or planet is None:
         return jsonify({"message": "invalid user id or favorite planet id"}), 404
-    
+
     # user.favorite_planets.append(planet)
 
     favorite_planet = Favorite_Planet(user_id=user.id, planet_id=planet.id)
@@ -130,8 +131,14 @@ def delete_favorite_person(people_id):
 
     if user is None:
         return jsonify({"message": "invalid user id"}), 404
-    
-    favorite_character = db.session.get(Favorite_Character, (body["user_id"], people_id))
+
+    # This code finds a record in the Favorite_Character table where the user id in the table matches the user id placed in the body of the request, and where the people id in the url matches a character id in the table, and returns the Favorite_Character object if it exists, or None if not. The scalar part is what either returns the object or none.
+    favorite_character = db.session.execute(
+        select(Favorite_Character).where(
+            (Favorite_Character.user_id == body["user_id"]) &
+            (Favorite_Character.character_id == people_id)
+        )
+    ).scalar_one_or_none()
 
     if favorite_character is None:
         return jsonify({"message": "that character id is not in this user's favorites"}), 404
@@ -150,8 +157,14 @@ def delete_favorite_planet(planet_id):
 
     if user is None:
         return jsonify({"message": "invalid user id"}), 404
-    
-    favorite_planet = db.session.get(Favorite_Planet, (body["user_id"], planet_id))
+
+    # See comment above in the other DELETE route for explanation on what this code syntax does.
+    favorite_planet = db.session.execute(
+        select(Favorite_Planet).where(
+            (Favorite_Planet.user_id == body["user_id"]) &
+            (Favorite_Planet.planet_id == planet_id)
+        )
+    ).scalar_one_or_none()
 
     if favorite_planet is None:
         return jsonify({"message": "that planet id is not in this user's favorites"}), 404
