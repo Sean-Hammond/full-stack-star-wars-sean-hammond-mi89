@@ -80,6 +80,8 @@ def get_favorites(user_id):
 @api.route("/favorite/people/<int:people_id>", methods=["POST"])
 def add_favorite_person(people_id):
     body = request.json
+    if "user_id" not in body or body is None:
+        return jsonify({"message": "Please enter a user_id into the body."}), 400
     user = db.session.get(User, body["user_id"])
     character = db.session.get(Character, people_id)
     if user is None or character is None:
@@ -93,6 +95,8 @@ def add_favorite_person(people_id):
 @api.route("/favorite/planet/<int:planet_id>", methods=["POST"])
 def add_favorite_planet(planet_id):
     body = request.json
+    if "user_id" not in body or body is None:
+        return jsonify({"message": "Please enter a user_id into the body."}), 400
     user = db.session.get(User, body["user_id"])
     planet = db.session.get(Planet, planet_id)
     if user is None or planet is None:
@@ -106,6 +110,8 @@ def add_favorite_planet(planet_id):
 @api.route("/favorite/people/<int:people_id>", methods=["DELETE"])
 def delete_favorite_person(people_id):
     body = request.json
+    if "user_id" not in body or body is None:
+        return jsonify({"message": "Please enter a user_id into the body."}), 400
     user = db.session.get(User, body["user_id"])
     character = db.session.get(Character, people_id)
     if user is None or character is None:
@@ -119,6 +125,8 @@ def delete_favorite_person(people_id):
 @api.route("/favorite/planet/<int:planet_id>", methods=["DELETE"])
 def delete_favorite_planet(planet_id):
     body = request.json
+    if "user_id" not in body or body is None:
+        return jsonify({"message": "Please enter a user_id into the body."}), 400
     user = db.session.get(User, body["user_id"])
     planet = db.session.get(Planet, planet_id)
     if user is None or planet is None:
