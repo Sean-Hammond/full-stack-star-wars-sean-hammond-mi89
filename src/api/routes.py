@@ -81,13 +81,12 @@ def get_favorites(user_id):
 def add_favorite_planet(planet_id):
     body = request.json
     user = db.session.get(User, body["user_id"])
-    planet = db.session.get(Character, planet_id)
+    planet = db.session.get(Planet, planet_id)
     if user is None or planet is None:
         return jsonify({"message": "invalid user id or favorite planet id"}), 404
     user.favorite_planets.append(planet)
     db.session.commit()
     seralized_user = user.serialize()
-    print("serialized user: " + seralized_user)
     return jsonify(seralized_user["favorite_planets"]), 201
 
 
@@ -101,7 +100,6 @@ def add_favorite_person(people_id):
     user.favorite_characters.append(character)
     db.session.commit()
     seralized_user = user.serialize()
-    print("serialized user: " + seralized_user)
     return jsonify(seralized_user["favorite_characters"]), 201
 
 
@@ -115,7 +113,6 @@ def delete_favorite_person(people_id):
     user.favorite_characters.remove(character)
     db.session.commit()
     seralized_user = user.serialize()
-    print("serialized user: " + seralized_user)
     return jsonify(seralized_user["favorite_characters"]), 201
 
 
@@ -129,7 +126,6 @@ def delete_favorite_planet(planet_id):
     user.favorite_planets.remove(planet)
     db.session.commit()
     seralized_user = user.serialize()
-    print("serialized user: " + seralized_user)
     return jsonify(seralized_user["favorite_planets"]), 201
 
 
