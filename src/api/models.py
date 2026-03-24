@@ -34,7 +34,7 @@ class User(db.Model):
 class Character(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    population: Mapped[int] = mapped_column(nullable=False)
+    mass: Mapped[int] = mapped_column(nullable=False)
     height: Mapped[int] = mapped_column(nullable=False)
     age: Mapped[int] = mapped_column(nullable=False)
     description: Mapped[str] = mapped_column(
@@ -49,7 +49,7 @@ class Character(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "population": self.population,
+            "mass": self.mass,
             "height": self.height,
             "age": self.age,
             "description": self.description,
@@ -61,7 +61,7 @@ class Character(db.Model):
 class Planet(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    population: Mapped[int] = mapped_column(nullable=False)
+    mass: Mapped[int] = mapped_column(nullable=False)
     circumference: Mapped[int] = mapped_column(nullable=False)
     characters: Mapped[List["Character"]] = relationship(
         back_populates="planet")
@@ -74,7 +74,7 @@ class Planet(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "population": self.population,
+            "mass": self.mass,
             "circumference": self.circumference,
             "description": self.description,
             # do not serialize the password, its a security breach
