@@ -127,10 +127,15 @@ def delete_favorite_person(people_id):
     if body is None or "user_id" not in body:
         return jsonify({"message": "Please enter a user_id into the body."}), 400
     user = db.session.get(User, body["user_id"])
-    character = db.session.get(Character, people_id)
-    if user is None or character is None:
-        return jsonify({"message": "invalid user id or favorite people id"}), 404
-    user.favorite_characters.remove(character)
+
+    if user is None:
+        return jsonify({"message": "invalid user id"}), 404
+    
+    favorite_character = db.session.get(Favorite_Character, (body["user_id"], people_id))
+
+    if favorite_character is None:
+        return jsonify({"message": "that character id is not in this user's favorites"}), 404
+    db.session.delete(favorite_character)
     db.session.commit()
     seralized_user = user.serialize()
     return jsonify(seralized_user), 201
@@ -142,10 +147,15 @@ def delete_favorite_planet(planet_id):
     if body is None or "user_id" not in body:
         return jsonify({"message": "Please enter a user_id into the body."}), 400
     user = db.session.get(User, body["user_id"])
-    planet = db.session.get(Planet, planet_id)
-    if user is None or planet is None:
-        return jsonify({"message": "invalid user id or favorite planet id"}), 404
-    user.favorite_planets.remove(planet)
+
+    if user is None:
+        return jsonify({"message": "invalid user id"}), 404
+    
+    favorite_planet = db.session.get(Favorite_Planet, (body["user_id"], planet_id))
+
+    if favorite_planet is None:
+        return jsonify({"message": "that planet id is not in this user's favorites"}), 404
+    db.session.delete(favorite_planet)
     db.session.commit()
     seralized_user = user.serialize()
     return jsonify(seralized_user), 201
