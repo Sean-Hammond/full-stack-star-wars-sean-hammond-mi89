@@ -6,6 +6,7 @@ from api.models import db, User, Character, Planet, Favorite_Character, Favorite
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from sqlalchemy import select
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
 api = Blueprint('api', __name__)
 
@@ -21,6 +22,17 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
+
+# The route that creates our token
+@api.route("/token", methods=["POST"])
+def create_token():
+    body = request.json
+    user = User.query.filter_by(email-body["email"], password-body["password"]).first()
+
+    if User is None:
+        return jsonify(["msg": "Bad email or password"]), 401
+    access_token = create_access_token(identity = str(user.id))
+    return jsonify({ "token": access_token, "user_id": user.id }), 200
 
 
 @api.route("/people", methods=["GET"])
@@ -78,11 +90,12 @@ def get_favorites(user_id):
 
 
 @api.route("/favorite/people/<int:people_id>", methods=["POST"])
+@jwt_required()
 def add_favorite_person(people_id):
-    body = request.json
-    if body is None or "user_id" not in body:
-        return jsonify({"message": "Please enter a user_id into the body."}), 400
-    user = db.session.get(User, body["user_id"])
+    current_user_id = get_jwt_identity()
+    if current_user_id is None:
+        return jsonify({"message": "invalid or missing user id."}), 400
+    user = db.session.get(User, current_user_id)
     character = db.session.get(Character, people_id)
     if user is None or character is None:
         return jsonify({"message": "invalid user id or favorite people id"}), 404
