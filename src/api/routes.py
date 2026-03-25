@@ -103,7 +103,7 @@ def add_favorite_person(people_id):
     # OLD CODE to add favorite to database, DIDN'T WORK:
         # user.favorite_characters.append(character)
 
-    # NEW CODE to add favorite to database, NOW TESTING:
+    # NEW CODE to add favorite to database, WORKED:
     favorite_character = Favorite_Character(
         user_id=user.id, character_id=character.id)
     db.session.add(favorite_character)
@@ -115,11 +115,12 @@ def add_favorite_person(people_id):
 
 
 @api.route("/favorite/planet/<int:planet_id>", methods=["POST"])
+@jwt_required
 def add_favorite_planet(planet_id):
-    body = request.json
-    if body is None or "user_id" not in body:
-        return jsonify({"message": "Please enter a user_id into the body."}), 400
-    user = db.session.get(User, body["user_id"])
+    current_user_id = get_jwt_identity()
+    if current_user_id is None:
+        return jsonify({"message": "invalid or missing user id."}), 400
+    user = db.session.get(User, current_user_id)
     planet = db.session.get(Planet, planet_id)
     if user is None or planet is None:
         return jsonify({"message": "invalid user id or favorite planet id"}), 404
