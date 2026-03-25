@@ -24,15 +24,18 @@ def handle_hello():
     return jsonify(response_body), 200
 
 # The route that creates our token
+
+
 @api.route("/token", methods=["POST"])
 def create_token():
     body = request.json
-    user = User.query.filter_by(email-body["email"], password-body["password"]).first()
+    user = User.query.filter_by(
+        email-body["email"], password-body["password"]).first()
 
     if User is None:
-        return jsonify(["msg": "Bad email or password"]), 401
-    access_token = create_access_token(identity = str(user.id))
-    return jsonify({ "token": access_token, "user_id": user.id }), 200
+        return jsonify({"msg": "Bad email or password"}), 401
+    access_token = create_access_token(identity=str(user.id))
+    return jsonify({"token": access_token, "user_id": user.id}), 200
 
 
 @api.route("/people", methods=["GET"])
@@ -94,11 +97,11 @@ def get_favorites(user_id):
 def add_favorite_person(people_id):
     current_user_id = get_jwt_identity()
     if current_user_id is None:
-        return jsonify({"message": "invalid or missing user id."}), 400
+        return jsonify({"message": "Invalid or missing user id."}), 400
     user = db.session.get(User, current_user_id)
     character = db.session.get(Character, people_id)
     if user is None or character is None:
-        return jsonify({"message": "invalid user id or favorite people id"}), 404
+        return jsonify({"message": "Invalid user id or favorite people id"}), 404
 
     # OLD CODE to add favorite to database, DIDN'T WORK:
         # user.favorite_characters.append(character)
@@ -119,11 +122,11 @@ def add_favorite_person(people_id):
 def add_favorite_planet(planet_id):
     current_user_id = get_jwt_identity()
     if current_user_id is None:
-        return jsonify({"message": "invalid or missing user id."}), 400
+        return jsonify({"message": "Invalid or missing user id."}), 400
     user = db.session.get(User, current_user_id)
     planet = db.session.get(Planet, planet_id)
     if user is None or planet is None:
-        return jsonify({"message": "invalid user id or favorite planet id"}), 404
+        return jsonify({"message": "Invalid user id or favorite planet id"}), 404
 
     # user.favorite_planets.append(planet)
 
@@ -137,58 +140,43 @@ def add_favorite_planet(planet_id):
 
 
 @api.route("/favorite/people/<int:people_id>", methods=["DELETE"])
+@jwt_required()  # Makes this secure
 def delete_favorite_person(people_id):
-    body = request.json
-    if body is None or "user_id" not in body:
-        return jsonify({"message": "Please enter a user_id into the body."}), 400
-    user = db.session.get(User, body["user_id"])
-
-    if user is None:
-        return jsonify({"message": "invalid user id"}), 404
-
-    # This code finds a record in the Favorite_Character table where the user id in the table matches the user id placed in the body of the request, and where the people id in the url matches a character id in the table, and returns the Favorite_Character object if it exists, or None if not. The scalar part is what either returns the object or none.
-    favorite_character = db.session.execute(
-        select(Favorite_Character).where(
-            (Favorite_Character.user_id == body["user_id"]) &
-            (Favorite_Character.character_id == people_id)
-        )
-    ).scalar_one_or_none()
-
-    if favorite_character is None:
-        return jsonify({"message": "that character id is not in this user's favorites"}), 404
-    db.session.delete(favorite_character)
+    current_user_id = get_jwt_identity()
+    if current_user_id is None:
+        return jsonify({"message": "Invalid or missing user id."}), 400
+    found_user = db.session.get(User, current_user_id)
+    found_character = db.session.get(Character, people_id)
+    if found_character is None:
+        return jsonify({"message": "That character id is not in this user's favorites"}), 404
+    found_user.favorite_characters.remove(found_character)
     db.session.commit()
-    seralized_user = user.serialize()
-    return jsonify(seralized_user), 201
+    serialized_user = found_user.serialize()
+    return jsonify(serialized_user["favorite_characters"]), 200
 
 
 @api.route("/favorite/planet/<int:planet_id>", methods=["DELETE"])
+@jwt_required()  # Makes this secure
 def delete_favorite_planet(planet_id):
-    body = request.json
-    if body is None or "user_id" not in body:
-        return jsonify({"message": "Please enter a user_id into the body."}), 400
-    user = db.session.get(User, body["user_id"])
-
-    if user is None:
-        return jsonify({"message": "invalid user id"}), 404
-
-    # See comment above in the other DELETE route for explanation on what this code syntax does.
-    favorite_planet = db.session.execute(
-        select(Favorite_Planet).where(
-            (Favorite_Planet.user_id == body["user_id"]) &
-            (Favorite_Planet.planet_id == planet_id)
-        )
-    ).scalar_one_or_none()
-
-    if favorite_planet is None:
-        return jsonify({"message": "that planet id is not in this user's favorites"}), 404
-    db.session.delete(favorite_planet)
+    current_user_id = get_jwt_identity()
+    if current_user_id is None:
+        return jsonify({"message": "Invalid or missing user id."}), 400
+    found_user = db.session.get(User, current_user_id)
+    found_planet = db.session.get(Planet, planet_id)
+    if found_planet is None:
+        return jsonify({"message": "That planet id is not in this user's favorites"}), 404
+    found_user.favorite_planets.remove(found_planet)
     db.session.commit()
-    seralized_user = user.serialize()
-    return jsonify(seralized_user), 201
+    serialized_user = found_user.serialize()
+    return jsonify(serialized_user["favorite_planets"]), 200
 
 
 # Update the database by running the terminal commands:
     # $ pipenv run migrate
     # $ pipenv run upgrade
     # $ pipenv run start
+
+# What to put in headers when testing in Postman:
+    # Key: Content-Type
+    # Value: applciation/json
+    # Checkbox should be CHECKED√
